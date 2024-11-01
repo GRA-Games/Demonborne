@@ -29,8 +29,8 @@ namespace Platformer.Mechanics
 
         public JumpState jumpState = JumpState.Grounded;
         private bool stopJump;
-        /*internal new*/ public Collider2D collider2d;
-        /*internal new*/ public AudioSource audioSource;
+        public Collider2D collider2d;
+        public AudioSource audioSource;
         public Health health;
         public bool controlEnabled = true;
 
@@ -50,6 +50,8 @@ namespace Platformer.Mechanics
             spriteRenderer = GetComponent<SpriteRenderer>();
             animator = GetComponent<Animator>();
         }
+
+
 
         protected override void Update()
         {
@@ -74,6 +76,7 @@ namespace Platformer.Mechanics
 
         void UpdateJumpState()
         {
+
             jump = false;
             switch (jumpState)
             {
@@ -90,10 +93,14 @@ namespace Platformer.Mechanics
                     }
                     break;
                 case JumpState.InFlight:
+                    // Set `isFalling` to true if the player is in flight and moving downward
+                    animator.SetBool("isFalling", velocity.y < 0);
                     if (IsGrounded)
                     {
                         Schedule<PlayerLanded>().player = this;
                         jumpState = JumpState.Landed;
+                        // Reset `isFalling` when the player lands
+                        animator.SetBool("isFalling", false);
                     }
                     break;
                 case JumpState.Landed:
