@@ -21,8 +21,9 @@ namespace Platformer.Gameplay
         public override void Execute()
         {
             var willHurtEnemy = player.Bounds.center.y >= enemy.Bounds.max.y;
+            var isAttacking = player.animator.GetCurrentAnimatorStateInfo(0).IsName("Player-Attack");
 
-            if (willHurtEnemy)
+            if (willHurtEnemy || isAttacking)
             {
                 var enemyHealth = enemy.GetComponent<Health>();
                 if (enemyHealth != null)
@@ -31,17 +32,19 @@ namespace Platformer.Gameplay
                     if (!enemyHealth.IsAlive)
                     {
                         Schedule<EnemyDeath>().enemy = enemy;
-                        player.Bounce(2);
-                    }
-                    else
-                    {
-                        player.Bounce(7);
+                        if (willHurtEnemy)
+                        {
+                            player.Bounce(2); // Bounce only if jumping
+                        }
                     }
                 }
                 else
                 {
                     Schedule<EnemyDeath>().enemy = enemy;
-                    player.Bounce(2);
+                    if (willHurtEnemy)
+                    {
+                        player.Bounce(2); // Bounce only if jumping
+                    }
                 }
             }
             else
