@@ -51,19 +51,27 @@ namespace Platformer.Mechanics
             animator = GetComponent<Animator>();
         }
 
-
+        public GameObject attackHitbox; // Reference to the hitbox GameObject
 
         protected override void Update()
         {
             if (controlEnabled)
             {
                 move.x = Input.GetAxis("Horizontal");
+
                 if (jumpState == JumpState.Grounded && Input.GetButtonDown("Jump"))
                     jumpState = JumpState.PrepareToJump;
                 else if (Input.GetButtonUp("Jump"))
                 {
                     stopJump = true;
                     Schedule<PlayerStopJump>().player = this;
+                }
+
+                // Trigger attack animation on input
+                if (Input.GetButtonDown("Fire1"))
+                {
+                    animator.SetTrigger("attack");
+                    PerformAttack(); // Handle attack logic
                 }
             }
             else
@@ -72,6 +80,41 @@ namespace Platformer.Mechanics
             }
             UpdateJumpState();
             base.Update();
+        }
+
+            public void ActivateHitbox()
+        {
+            attackHitbox.GetComponent<AttackHitbox>().ActivateHitbox();
+        }
+
+        public void DeactivateHitbox()
+        {
+            attackHitbox.GetComponent<AttackHitbox>().DeactivateHitbox();
+        }
+
+        void PerformAttack()
+        {
+            // Define attack range and detect enemies
+            float attackRange = 1.0f; // Adjust as needed
+            LayerMask enemyLayer = LayerMask.GetMask("Enemy");
+
+            Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(transform.position, attackRange, enemyLayer);
+
+            foreach (Collider2D enemy in hitEnemies)
+            {
+                var health = enemy.GetComponent<Health>();
+                if (health != null)
+                {
+                    health.Decrement(); // Apply damage
+                }
+            }
+        }
+
+        // Optional: Visualize the attack range
+        void OnDrawGizmosSelected()
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(transform.position, 1.0f); // Match attack range
         }
 
         void UpdateJumpState()
