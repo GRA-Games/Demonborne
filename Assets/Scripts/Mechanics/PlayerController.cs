@@ -42,6 +42,8 @@ namespace Platformer.Mechanics
 
         public Bounds Bounds => collider2d.bounds;
 
+        [SerializeField] private float attackRange = 1.0f; // Attack range
+
         void Awake()
         {
             health = GetComponent<Health>();
@@ -82,30 +84,48 @@ namespace Platformer.Mechanics
             base.Update();
         }
 
-            public void ActivateHitbox()
-        {
-            attackHitbox.GetComponent<AttackHitbox>().ActivateHitbox();
-        }
-
-        public void DeactivateHitbox()
-        {
-            attackHitbox.GetComponent<AttackHitbox>().DeactivateHitbox();
-        }
 
         void PerformAttack()
         {
-            // Define attack range and detect enemies
-            float attackRange = 1.0f; // Adjust as needed
+            // Determine the player's facing direction
+            float facingDirection = spriteRenderer.flipX ? -1 : 1;
+            Vector3 attackPosition = transform.position + new Vector3(facingDirection * attackRange * 0.5f, 0, 0);
+
             LayerMask enemyLayer = LayerMask.GetMask("Enemy");
+            Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPosition, attackRange, enemyLayer);
 
-            Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(transform.position, attackRange, enemyLayer);
+            Debug.Log($"Number of enemies detected: {hitEnemies.Length}");
 
-            foreach (Collider2D enemy in hitEnemies)
+            foreach (Collider2D collider in hitEnemies)
             {
-                var health = enemy.GetComponent<Health>();
-                if (health != null)
+                // Try to get the EnemyController directly from the detected collider
+                var enemyController = collider.GetComponentInParent<EnemyController>();
+                if (enemyController != null)
                 {
-                    health.Decrement(); // Apply damage
+                    Debug.Log($"EnemyController found: {enemyController.name}");
+
+                    // Access the Health component through the EnemyController
+                    var enemyHealth = enemyController.GetComponent<Health>();
+                    if (enemyHealth != null)
+                    {
+                        Debug.Log($"Health found on enemy {enemyController.name}. Decreasing HP.");
+                        enemyHealth.Decrement();
+
+                        // Optional: Schedule the enemy's death if health reaches 0
+                        if (!enemyHealth.IsAlive)
+                        {
+                            Debug.Log($"Enemy {enemyController.name} has died.");
+                            Schedule<EnemyDeath>().enemy = enemyController;
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"Enemy {enemyController.name} does not have a Health component!");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning($"No EnemyController found for {collider.name}!");
                 }
             }
         }
@@ -113,8 +133,11 @@ namespace Platformer.Mechanics
         // Optional: Visualize the attack range
         void OnDrawGizmosSelected()
         {
+            float facingDirection = spriteRenderer != null && spriteRenderer.flipX ? -1 : 1;
+            Vector3 attackPosition = transform.position + new Vector3(facingDirection * attackRange * 0.5f, 0, 0);
+
             Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(transform.position, 1.0f); // Match attack range
+            Gizmos.DrawWireSphere(attackPosition, attackRange);
         }
 
         void UpdateJumpState()

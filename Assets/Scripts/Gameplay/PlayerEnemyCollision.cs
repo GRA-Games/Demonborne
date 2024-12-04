@@ -6,11 +6,9 @@ using static Platformer.Core.Simulation;
 
 namespace Platformer.Gameplay
 {
-
     /// <summary>
     /// Fired when a Player collides with an Enemy.
     /// </summary>
-    /// <typeparam name="EnemyCollision"></typeparam>
     public class PlayerEnemyCollision : Simulation.Event<PlayerEnemyCollision>
     {
         public EnemyController enemy;
@@ -20,37 +18,23 @@ namespace Platformer.Gameplay
 
         public override void Execute()
         {
-            var willHurtEnemy = player.Bounds.center.y >= enemy.Bounds.max.y;
-            var isAttacking = player.animator.GetCurrentAnimatorStateInfo(0).IsName("Player-Attack");
-
-            if (willHurtEnemy || isAttacking)
+            // Remove jump-based enemy kill logic
+            var enemyHealth = enemy.GetComponent<Health>();
+            if (enemyHealth != null)
             {
-                var enemyHealth = enemy.GetComponent<Health>();
-                if (enemyHealth != null)
-                {
-                    enemyHealth.Decrement();
-                    if (!enemyHealth.IsAlive)
-                    {
-                        Schedule<EnemyDeath>().enemy = enemy;
-                        if (willHurtEnemy)
-                        {
-                            player.Bounce(2); // Bounce only if jumping
-                        }
-                    }
-                }
-                else
+                enemyHealth.Decrement();
+                if (!enemyHealth.IsAlive)
                 {
                     Schedule<EnemyDeath>().enemy = enemy;
-                    if (willHurtEnemy)
-                    {
-                        player.Bounce(2); // Bounce only if jumping
-                    }
                 }
             }
             else
             {
-                Schedule<PlayerDeath>();
+                Schedule<EnemyDeath>().enemy = enemy;
             }
+
+            // Player dies if not attacking
+            Schedule<PlayerDeath>();
         }
     }
 }
