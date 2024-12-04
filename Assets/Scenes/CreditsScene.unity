@@ -213,7 +213,7 @@ PrefabInstance:
     - target: {fileID: 2421666829484044819, guid: 6d4b661face4c44a6a67985c0c38df1f,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -1013
+      value: -1224
       objectReference: {fileID: 0}
     - target: {fileID: 2421666829484044819, guid: 6d4b661face4c44a6a67985c0c38df1f,
         type: 3}
@@ -716,7 +716,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: InstructionScene
+          m_StringArgument: MainMenu
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!224 &823231985 stripped
