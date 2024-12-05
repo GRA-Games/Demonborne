@@ -1,29 +1,52 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-
-namespace Platformer.View
+ 
+public class ParallaxBackground : MonoBehaviour
 {
-    /// <summary>
-    /// Used to move a transform relative to the main camera position with a scale factor applied.
-    /// This is used to implement parallax scrolling effects on different branches of gameobjects.
-    /// </summary>
-    public class ParallaxLayer : MonoBehaviour
+    //https://www.youtube.com/watch?v=wBol2xzxCOU
+    public Vector2 parallaxEffectMultiplier;
+    public bool infiniteHorizontal;
+    public bool infiniteVertical;
+ 
+    private Transform cameraTransform;
+    private Vector3 lastCameraPosition;
+    private float textureUnitSizeX;
+    private float textureUnitSizeY;
+ 
+    void Start()
     {
-        /// <summary>
-        /// Movement of the layer is scaled by this value.
-        /// </summary>
-        public Vector3 movementScale = Vector3.one;
-
-        Transform _camera;
-
-        void Awake()
+ 
+        cameraTransform = Camera.main.transform;
+        lastCameraPosition = cameraTransform.position;
+        Sprite sprite = GetComponent<SpriteRenderer>().sprite;
+        Texture2D texture = sprite.texture;
+        textureUnitSizeX = (texture.width / sprite.pixelsPerUnit) * transform.localScale.x;
+        textureUnitSizeY = (texture.height / sprite.pixelsPerUnit) * transform.localScale.y;
+    }
+ 
+    void FixedUpdate()
+    {
+        Vector3 deltaMovement = cameraTransform.position - lastCameraPosition;
+        transform.position -= new Vector3(deltaMovement.x * parallaxEffectMultiplier.x, deltaMovement.y * parallaxEffectMultiplier.y);
+        lastCameraPosition = cameraTransform.position;
+ 
+        if (infiniteHorizontal)
         {
-            _camera = Camera.main.transform;
+            if (Mathf.Abs(cameraTransform.position.x - transform.position.x) >= textureUnitSizeX)
+            {
+                float offsetPositionX = (cameraTransform.position.x - transform.position.x) % textureUnitSizeX;
+                transform.position = new Vector3(cameraTransform.position.x + offsetPositionX, transform.position.y);
+            }
         }
-
-        void LateUpdate()
+ 
+        if (infiniteVertical)
         {
-            transform.position = Vector3.Scale(_camera.position, movementScale);
+            if (Mathf.Abs(cameraTransform.position.y - transform.position.y) >= textureUnitSizeY)
+            {
+                float offsetPositionY = (cameraTransform.position.y - transform.position.y) % textureUnitSizeY;
+                transform.position = new Vector3(transform.position.x, cameraTransform.position.y + offsetPositionY);
+            }
         }
-
     }
 }
