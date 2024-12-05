@@ -40,6 +40,12 @@ namespace Platformer.Mechanics
 
         public bool isAttacking;
 
+        public bool isInvincible;
+
+        public bool isFacingRight;
+
+        private bool isAttackCoroutineRunning = false;
+
         bool jump;
         Vector2 move;
         SpriteRenderer spriteRenderer;
@@ -83,62 +89,129 @@ namespace Platformer.Mechanics
             base.Update();
         }
 
-        void OnTriggerEnter2D(Collider2D collision)
+        void OnCollisionEnter2D(Collision2D collision)
         {
-            // Ensure this script is attached to the `AttackZone`
             if (collision.gameObject.CompareTag("Enemy"))
             {
-                var enemy = collision.GetComponent<EnemyController>();
-                if (enemy != null)
+            
+                if (!isAttacking)
                 {
-                    enemy.TakeDamage(); // Trigger damage on the enemy
+                    TakeDamage();
                 }
             }
         }
 
         void PerformAttack()
         {
-            // Trigger attack animation
-            animator.SetTrigger("attack");
-
-            StartCoroutine(ActivateAttackZone());
-
-            // Play audio (optional)
-            if (audioSource && attackAudio)
+            if (!isAttackCoroutineRunning)
             {
-                audioSource.PlayOneShot(attackAudio);
-            }
-
-            // Handle attack logic (e.g., Raycast or collider interaction)
-            Vector2 attackPosition = transform.position + (spriteRenderer.flipX ? Vector3.left : Vector3.right);
-            RaycastHit2D hit = Physics2D.Raycast(attackPosition, spriteRenderer.flipX ? Vector2.left : Vector2.right, 1f);
-
-            if (hit.collider != null)
-            {
-                var enemy = hit.collider.GetComponent<EnemyController>();
-                if (enemy != null)
-                {
-                    enemy.TakeDamage();
-                }
+                StartCoroutine(ActivateAttackZone());
             }
         }
 
         IEnumerator ActivateAttackZone()
         {
-            yield return new WaitForSeconds(0.3f);
-            // Activate the attack collider for a short duration
             isAttacking = true;
-            attackZone.SetActive(true);
+            controlEnabled = false;
+            isAttackCoroutineRunning = true;
 
-            // TODO Wait for the duration of the attack animation (adjust the timing as needed)
-            yield return new WaitForSeconds(0.3f);
+            
 
-            // Disable the attack collider after the attack
-            attackZone.SetActive(false);
-            isAttacking = false;
+            // Trigger attack animation
+            animator.SetTrigger("attack");
 
             yield return new WaitForSeconds(0.1f);
+
+            // Play attack sound effect
+            if (audioSource && attackAudio)
+            {
+                audioSource.PlayOneShot(attackAudio);
+            }
+
+            // Notify the AttackZone to enable its collider
+            if (attackZone != null)
+            {
+                AttackZoneController attackZoneController = attackZone.GetComponent<AttackZoneController>();
+                if (attackZoneController != null)
+                {
+                    attackZoneController.EnableCollider();
+                    Debug.Log("AttackZone activated.");
+                }
+            }
+
+            yield return new WaitForSeconds(0.3f);
+
+            // Notify the AttackZone to disable its collider
+            if (attackZone != null)
+            {
+                AttackZoneController attackZoneController = attackZone.GetComponent<AttackZoneController>();
+                if (attackZoneController != null)
+                {
+                    attackZoneController.DisableCollider();
+                    Debug.Log("AttackZone deactivated.");
+                }
+            }
+
+            isAttacking = false;
+            controlEnabled = true;
+            isAttackCoroutineRunning = false;
+
+            yield return null;
         }
+        public void TakeDamage()
+        {
+            // Check if the player is invincible; if so, do not apply damage
+            if (isInvincible)
+            {
+                Debug.Log("Player is invincible and cannot take damage.");
+                return;
+            }
+
+            // Decrement player health through Health component
+            health.Decrement();
+            Debug.Log("Player takes damage, health remaining: " + health.currentHP);
+
+            // If health is still above 0, trigger invincibility frames
+            if (health.currentHP > 0)
+            {
+                StartCoroutine(ActivateIframes());
+            }
+
+            // Optional: Play damage sound
+            if (audioSource && ouchAudio)
+            {
+                audioSource.PlayOneShot(ouchAudio);
+            }
+        }
+
+        public Material originalMaterial;      // Store the original material
+        public Material whiteMaterial;
+
+        IEnumerator ActivateIframes()
+        {
+            originalMaterial = spriteRenderer.material;
+
+            isInvincible = true;
+            Debug.Log("Player is now invincible.");
+
+            // Optional: Add visual feedback (e.g., blinking)
+            for (int i = 0; i < 5; i++)
+            {
+                spriteRenderer.material = whiteMaterial;
+                yield return new WaitForSeconds(0.1f);
+                spriteRenderer.material = originalMaterial;
+                yield return new WaitForSeconds(0.1f);
+            }
+
+            spriteRenderer.material = originalMaterial;
+
+            // Iframes duration
+            yield return new WaitForSeconds(1f);
+            isInvincible = false;
+
+            Debug.Log("Player invincibility ended.");
+        }
+
 
 
         void UpdateJumpState()
@@ -171,6 +244,8 @@ namespace Platformer.Mechanics
             }
         }
 
+        
+
         protected override void ComputeVelocity()
         {
             if (jump && IsGrounded)
@@ -187,28 +262,17 @@ namespace Platformer.Mechanics
                 }
             }
 
-            // Access the BoxCollider2D component of attackZone
-            BoxCollider2D attackZoneCollider = attackZone.GetComponent<BoxCollider2D>();
 
             if (move.x > 0.01f)
             {
                 spriteRenderer.flipX = false;
+                isFacingRight = true;
 
-                // Set the attackZone offset to -11.6 when moving right
-                if (attackZoneCollider != null)
-                {
-                    attackZoneCollider.offset = new Vector2(-11.6f, attackZoneCollider.offset.y);
-                }
             }
             else if (move.x < -0.01f)
             {
                 spriteRenderer.flipX = true;
-
-                // Set the attackZone offset to -13.7 when moving left
-                if (attackZoneCollider != null)
-                {
-                    attackZoneCollider.offset = new Vector2(-13.88f, attackZoneCollider.offset.y);
-                }
+                isFacingRight = false;
             }
 
             animator.SetBool("grounded", IsGrounded);
