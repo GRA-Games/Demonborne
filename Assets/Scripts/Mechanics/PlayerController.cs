@@ -5,7 +5,9 @@ using Platformer.Gameplay;
 using static Platformer.Core.Simulation;
 using Platformer.Model;
 using Platformer.Core;
+#if UNITY_WSA
 using UnityEngine.WSA;
+#endif
 
 namespace Platformer.Mechanics
 {
