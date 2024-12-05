@@ -67,6 +67,9 @@ MonoBehaviour:
   attackZone: {fileID: 0}
   isAttacking: 0
   isInvincible: 0
+  isFacingRight: 0
+  originalMaterial: {fileID: 0}
+  whiteMaterial: {fileID: 2100000, guid: 4f152d29cabab7744b5efa590991ae89, type: 2}
 --- !u!212 &212064061491315838
 SpriteRenderer:
   m_ObjectHideFlags: 0

@@ -22,8 +22,6 @@ namespace Platformer.Gameplay
             // player.collider.enabled = false;
             player.controlEnabled = false;
 
-            if (player.audioSource && player.ouchAudio)
-                player.audioSource.PlayOneShot(player.ouchAudio);
             player.animator.SetTrigger("hurt");
             player.animator.SetBool("dead", true);
             Debug.Log("Player Dead - from PlayerDeath.cs");
