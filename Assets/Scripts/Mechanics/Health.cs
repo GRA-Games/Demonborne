@@ -27,7 +27,7 @@ namespace Platformer.Mechanics
         /// </summary>
         public void Increment()
         {
-            currentHP = Mathf.Clamp(maxHP, 0, maxHP);
+            currentHP = Mathf.Clamp(currentHP + 1, 0, maxHP);
         }
 
         /// <summary>
@@ -45,6 +45,10 @@ namespace Platformer.Mechanics
                 ev.health = this;
             }
         }
+
+        /// <summary>
+        /// Decrement the HP of the entitiy until HP reaches 0.
+        /// </summary>
 
 
         void Awake()
