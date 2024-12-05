@@ -94,7 +94,7 @@ namespace Platformer.Mechanics
             if (collision.gameObject.CompareTag("Enemy"))
             {
             
-                if (!isAttacking)
+                if (!isAttacking && !isInvincible)
                 {
                     TakeDamage();
                 }
