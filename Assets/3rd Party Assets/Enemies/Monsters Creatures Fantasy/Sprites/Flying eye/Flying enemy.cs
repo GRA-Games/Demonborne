@@ -1,3 +1,4 @@
+using Platformer.Mechanics;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,27 +10,39 @@ public class Flying_enemy : MonoBehaviour
     public bool chase=false;
     private GameObject player;
     public Transform startingPoint;
- 
+    internal Health health;
+    public GameObject Bat;
+
     // Start is called before the first frame update
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
+        health = GetComponent<Health>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (player == null) {
-            return;
-        }
-        if (chase == true)
+        
+        if (health.currentHP>0)
         {
-            Chase();
+            if (player == null)
+            {
+                return;
+            }
+            if (chase == true)
+            {
+                Chase();
+            }
+            else
+                returnStartpoint();
+
+            flip();
         }
-        else
-            returnStartpoint();
-                
-        flip();
+        if (health.currentHP == 0)
+        {
+           Bat.gameObject.SetActive(false);
+        }
 
     }
     public void Chase()
