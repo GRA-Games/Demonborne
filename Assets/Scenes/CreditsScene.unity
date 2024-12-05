@@ -413,7 +413,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -1764}
+  m_AnchoredPosition: {x: 0, y: -1900}
   m_SizeDelta: {x: 2560, y: 2500}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!95 &521820421
@@ -467,49 +467,52 @@ MonoBehaviour:
     Miguel Perez
 
 
-    Role
+    Max
+    Corpus
 
     Person
 
 
-    Role
+    Max Corpus
 
     Person
 
 
-    Role
+    UI/UX
 
-    Person
-
-
-    Role
-
-    Person
+    Shannon Cascaddan
 
 
-    Role
+    Instructional
+    Content
 
-    Person
-
-
-    Role
-
-    Person
+    Shannon Cascaddan
 
 
-    Role
+    Token Counter
 
-    Person
-
-
-    Role
-
-    Person
+    Danny Nguyen
 
 
+    Gameplay
+    Systems
 
-    Thank
-    you for playing!'
+    Danny Nguyen
+
+
+    Branch Manager
+
+    Quaid Everett
+
+
+    Gamplay
+    Designer
+
+    Quaid Everett
+
+
+
+    Thank you for playing!'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
