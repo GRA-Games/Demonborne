@@ -51,5 +51,14 @@ namespace Platformer.Mechanics
             }
         }
 
+        public void TakeDamage()
+        {
+            var healthComponent = GetComponent<Health>();
+            if (healthComponent != null)
+            {
+                healthComponent.Decrement();
+            }
+        }
+
     }
 }
