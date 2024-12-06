@@ -1,5 +1,18 @@
 # Demonborne
-CS4700 Project
+**CS4700 Project**
 
-Link to itch.io game
-https://mperez561.itch.io/demonborne
+---
+
+## 🎮 Play the Game
+[**Demonborne on itch.io**](https://mperez561.itch.io/demonborne)
+
+---
+
+## 👥 Contributors
+- **Max Corpuz**
+- **Quaid Everett**
+- **Shannon Cascaddan**
+- **Danny Nguyen**
+- **Miguel Perez**
+
+---
